@@ -1,0 +1,167 @@
+#!/usr/bin/env python
+import os
+import sys
+import subprocess
+"""
+n: A command for managing a flat directory of plain text notes.
+
+Usage:
+
+The `n` command with no arguments prints an enumerated list of the filenames of
+all files in ~/txt/, most-recently-modified last:
+
+    $ n
+    5: todo
+    4: Grocery list
+    3: Recipe for miso soup
+    2: How to read your email with mutt
+    1: How to create HTML with markdown
+    Enter a number: [1] _
+
+The most-recently-modified files are printed last so that if you have a lot of
+files it'll be the older ones that scroll of the top of your terminal.
+
+Enter the number of a file at the prompt to open that file in your $EDITOR.
+The default option (if you enter nothing at the prompt) will be to open the
+most-recently-modified (and last printed) file.
+Press ctrl-c at the prompt if you don't want to open anything.
+
+The `n` command with some arguments prints an enumerated list of the filenames
+of those files from ~/txt/ that match all of the given search words:
+
+    $ n how to
+    2: How to read your email with mutt
+    1: How to create HTML with markdown
+    0: Create note: 'how to'
+    Enter a number: [0] _
+
+Again, enter the number of a file at the prompt to open it in your $EDITOR.
+In this case the default option is to create a new note from the search term.
+`n` doesn't actually create the note file, it just opens it in your $EDITOR, to
+create the file you have to write it from your $EDITOR.
+If an existing note's filename matches the search term exactly then the default
+option will be to open that note instead.
+
+Only top-level files in ~/txt are searched, subdirectories are ignored.
+
+Both the file names and the file contents are searched.
+
+The search is fuzzy. A file will match a search term if it contains all of the
+search words anywhere in its file name of contents, the words do not have to
+appear consecutively or in the same order as they are given in the search term.
+
+The search is smart case. For each search word, if the word is all lower-case
+then it will be matched case-insensitively. If the word contains any upper-case
+letters then it will be matched case-sensitively.
+
+"""
+def get_matching_filenames(notes_dir,search_words):
+    """Return a list of all the top-level filenames in notes_dir that match the
+    given search words, sorted by modification time.
+
+    The search is not recursive, sub-directories of notes_dir are ignored.
+
+    Backup files (with filenames ending in ~) are never returned.
+
+    Both the file names and the file contents are searched.
+
+    The search is fuzzy: a file will be returned as long as it contains all of
+    the search words, the words do not have to appear consecutively and they do
+    not have to appear in the same order as they are given in the search term.
+
+    The search is smart-case: if a search word contains only lower-case letters
+    then that search word is matched case-insensitively. If a search word
+    contains any upper-case letters then that search word is matched
+    case-sensitively.
+
+    """
+    filenames = [f for f in os.listdir(notes_dir) if os.path.isfile(os.path.join(notes_dir,f))]
+    matching_filenames = []
+    for filename in filenames:
+        # Skip backup files.
+        if filename.endswith('~'): continue
+        # Get file contents.
+        contents = open(os.path.join(notes_dir,filename),'r').read()
+        # Skip files that don't match all search terms.
+        skip = False
+        for word in search_words:
+            if word.islower():
+                # Search for word case-insensitively.
+                if (not word in filename.lower()) and (not word in contents.lower()):
+                    skip = True
+                    break
+            else:
+                # Search for word case-sensitively.
+                if (not word in filename) and (not word in contents):
+                    skip = True
+                    break
+        if not skip:
+            matching_filenames.append(filename)
+    matching_filenames.sort(key = lambda f: os.path.getmtime(os.path.join(notes_dir,f)))
+    return matching_filenames
+
+def print_list(strings):
+    """Print out a list of strings as an enumerated list.
+
+    """
+    number = len(strings)
+    for string in strings:
+        print str(number)+': '+string
+        number-=1
+
+def get_number(prompt,default):
+    """Get an int from the user.
+
+    """
+    try:
+        input = raw_input("%s: [%s] " % (prompt,default)).strip()
+    except KeyboardInterrupt:
+        sys.exit()
+    if input == "": input = default
+    try:
+        number = int(input)
+    except ValueError:
+        sys.exit("That is not a number.")
+    if number < 0:
+        sys.exit("That number is out of range.")
+    return number
+
+def system(cmd):
+    """Execute a system command in a subshell and return the exit status.
+
+    """
+    p = subprocess.Popen(cmd, shell=True)
+    return os.waitpid(p.pid, 0)[1]
+
+def main(notes_dir):
+    search_words = sys.argv[1:]
+    matching_filenames = get_matching_filenames(notes_dir,search_words)
+    exact_match = " ".join(search_words)
+    if search_words and not os.path.exists(os.path.join(notes_dir,exact_match)):
+        print_list(matching_filenames)
+        print "0: Create note: '%s'" % exact_match
+        number = get_number("Enter a number",0)
+        if number == 0:
+            path = os.path.join(notes_dir,exact_match)
+        else:
+            assert(number>0)
+            try:
+                path = os.path.join(notes_dir,matching_filenames[-number])
+            except IndexError:
+                sys.exit("That number is out of range.")
+    else:
+        if search_words and os.path.exists(os.path.join(notes_dir,exact_match)):
+            # Print exact matches last.
+            matching_filenames.remove(exact_match)
+            matching_filenames.append(exact_match)
+        print_list(matching_filenames)
+        number = get_number("Enter a number",1)
+        try:
+            path = os.path.join(notes_dir,matching_filenames[-number])
+        except IndexError:
+            sys.exit("That number is out of range.")
+    sys.exit(system('$EDITOR "%s"' % path))
+
+if __name__ == '__main__':
+    notes_dir = os.path.abspath(os.path.expanduser("~/txt/"))
+    main(notes_dir)
