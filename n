@@ -133,8 +133,7 @@ def system(cmd):
     p = subprocess.Popen(cmd, shell=True)
     return os.waitpid(p.pid, 0)[1]
 
-def main(notes_dir):
-    search_words = sys.argv[1:]
+def main(notes_dir,search_words,editor):
     matching_filenames = get_matching_filenames(notes_dir,search_words)
     exact_match = " ".join(search_words)
     if search_words and not os.path.exists(os.path.join(notes_dir,exact_match)):
@@ -160,8 +159,13 @@ def main(notes_dir):
             path = os.path.join(notes_dir,matching_filenames[-number])
         except IndexError:
             sys.exit("That number is out of range.")
-    sys.exit(system('$EDITOR "%s"' % path))
+    sys.exit(system('%s "%s"' % (editor,path)))
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Search, view, create and edit plain text notes.')
+    parser.add_argument('-e','--editor',dest='editor',action='store',default='$EDITOR',help="the text editor to use for opening note files (defaults to $EDITOR)")
+    parser.add_argument('search_words',action='store',help="if one or more search words are given, only notes containing all of those search words will be listed",nargs='*')
+    args = parser.parse_args()
     notes_dir = os.path.abspath(os.path.expanduser("~/txt/"))
-    main(notes_dir)
+    main(notes_dir,search_words=args.search_words,editor=args.editor)
