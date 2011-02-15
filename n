@@ -134,6 +134,10 @@ def system(cmd):
     return os.waitpid(p.pid, 0)[1]
 
 def main(notes_dir,search_words,editor):
+    notes_dir = os.path.abspath(os.path.expanduser(notes_dir))
+    # Create notes_dir if it doesn't exist.
+    if not os.path.isdir(notes_dir):
+        os.mkdir(notes_dir)
     matching_filenames = get_matching_filenames(notes_dir,search_words)
     exact_match = " ".join(search_words)
     if search_words and not os.path.exists(os.path.join(notes_dir,exact_match)):
@@ -165,7 +169,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Search, view, create and edit plain text notes.')
     parser.add_argument('-e','--editor',dest='editor',action='store',default='$EDITOR',help="the text editor to use for opening note files (defaults to $EDITOR)")
+    parser.add_argument('-d','--notes-dir',dest='notes_dir',action='store',default='~/txt/',help="the notes directory to use (defaults to ~/txt/)")
     parser.add_argument('search_words',action='store',help="if one or more search words are given, only notes containing all of those search words will be listed",nargs='*')
     args = parser.parse_args()
-    notes_dir = os.path.abspath(os.path.expanduser("~/txt/"))
-    main(notes_dir,search_words=args.search_words,editor=args.editor)
+    main(notes_dir=args.notes_dir, search_words=args.search_words, editor=args.editor)
