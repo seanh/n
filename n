@@ -83,8 +83,9 @@ def get_matching_filenames(notes_dir,search_words):
     filenames = [f for f in os.listdir(notes_dir) if os.path.isfile(os.path.join(notes_dir,f))]
     matching_filenames = []
     for filename in filenames:
-        # Skip backup files.
-        if filename.endswith('~'): continue
+        # Skip backup files and hidden files.
+        if filename.endswith('~') or filename.startswith('.'):
+            continue
         # Get file contents.
         contents = open(os.path.join(notes_dir,filename),'r').read()
         # Skip files that don't match all search terms.
