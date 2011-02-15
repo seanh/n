@@ -54,6 +54,11 @@ The search is smart case. For each search word, if the word is all lower-case
 then it will be matched case-insensitively. If the word contains any upper-case
 letters then it will be matched case-sensitively.
 
+TODO
+----
+*   Print out an error msg if notes dir is empty and no search words are given
+*   get_matching_filenames should not crash if notes_dir doesn't exist
+
 """
 def get_matching_filenames(notes_dir,search_words):
     """Return a list of all the top-level filenames in notes_dir that match the
