@@ -6,7 +6,7 @@ notes. You keep all of your notes as plain text files in a directory and use
 the simple command `n [search words]` to list your notes in order of
 modification, search your notes, view, edit and create notes.
 
-### Usage
+### Listing All of Your Notes
 
 The `n` command with no arguments prints an enumerated list of the filenames of
 all files in `~/txt/`, most-recently-modified last:
@@ -27,6 +27,8 @@ The default option (if you enter nothing at the prompt and just press return)
 will be to open the most-recently-modified (and last printed) file.  Press
 ctrl-c at the prompt if you don't want to open anything.
 
+### Searching and Creating Notes
+
 The `n` command with some arguments prints an enumerated list of the filenames
 of those files from `~/txt/` that match all of the given search words:
 
@@ -44,6 +46,17 @@ $EDITOR, to create the file you have to write it from your $EDITOR.
 
 If an existing note's filename matches the search term exactly then the default
 option will be to open that note instead.
+
+
+**The same command is used to search and to create notes**. In the process of
+entering the title for a new note with a command like `n My New Tofu Recipe`,
+related notes are printed out for you and you're given the chance to view
+and/or edit one of those notes instead. Likewise, if your search finds no
+matching notes you just have to press return to create a new note using the
+search term as the title. This helps you to keep your notes organised, and is
+most effective if you make lots of small notes in different files, instead of a
+few big notes in a few files.
+<small>(This idea comes straight from <a href="http://notational.net/">Notational Velocity</a>.)</small>
 
 #### Details
 
