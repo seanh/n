@@ -62,10 +62,10 @@ letters then it will be matched case-sensitively.
 #### Options
 
 `-e`, `--editor`  
-the text editor to use for opening note files (defaults to $EDITOR)
+the text editor to use for opening note files (defaults to $EDITOR), e.g. `n --editor="gvim --remote-silent"`
 
 `-d`, `--notes-dir`  
-the notes directory to use (defaults to ~/txt/)
+the notes directory to use (defaults to ~/txt/), e.g. `n --notes-dir="~/Dropbox/Notes"`
 
 `-h`, `--help`  
 show a help message and exit
