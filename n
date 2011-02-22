@@ -97,7 +97,7 @@ def main(notes_dir,search_words,editor):
     if not os.path.isdir(notes_dir):
         os.mkdir(notes_dir)
     matching_filenames = get_matching_filenames(notes_dir,search_words)
-    exact_match = " ".join(search_words)
+    exact_match = " ".join(search_words) + ".txt"
     if search_words and not os.path.exists(os.path.join(notes_dir,exact_match)):
         print_list(matching_filenames)
         print "0: Create note: '%s'" % exact_match
