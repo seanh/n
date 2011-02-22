@@ -135,6 +135,5 @@ then only notes containing all of the search words will be listed."""
             default='$EDITOR', help="the text editor to use for opening note files (defaults to %default)")
     parser.add_option('-d', '--directory', dest='notes_dir',
             action='store', default='~/txt/', help="the notes directory to use (defaults to %default)")
-    #parser.add_argument('search_words',action='store',help="if one or more search words are given, only notes containing all of those search words will be listed",nargs='*')
     (options, args) = parser.parse_args()
     main(notes_dir=options.notes_dir, search_words=args, editor=options.editor)
