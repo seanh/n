@@ -97,7 +97,7 @@ def main(notes_dir,search_words,editor):
     if not os.path.isdir(notes_dir):
         os.mkdir(notes_dir)
     matching_filenames = get_matching_filenames(notes_dir,search_words)
-    exact_match = " ".join(search_words)
+    exact_match = " ".join(search_words) + ".txt"
     if search_words and not os.path.exists(os.path.join(notes_dir,exact_match)):
         print_list(matching_filenames)
         print "0: Create note: '%s'" % exact_match
@@ -124,10 +124,17 @@ def main(notes_dir,search_words,editor):
     sys.exit(system('%s "%s"' % (editor,path)))
 
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description='Search, view, create and edit plain text notes.')
-    parser.add_argument('-e','--editor',dest='editor',action='store',default='$EDITOR',help="the text editor to use for opening note files (defaults to $EDITOR)")
-    parser.add_argument('-d','--notes-dir',dest='notes_dir',action='store',default='~/txt/',help="the notes directory to use (defaults to ~/txt/)")
-    parser.add_argument('search_words',action='store',help="if one or more search words are given, only notes containing all of those search words will be listed",nargs='*')
-    args = parser.parse_args()
-    main(notes_dir=args.notes_dir, search_words=args.search_words, editor=args.editor)
+    from optparse import OptionParser
+    usage ="%prog [options] [search words]"
+    description="""Search, view, create and edit plain text notes. Prints
+a menu listing plain text note files in NOTES_DIR. A note file can be
+selected from the menu to open it in EDITOR. If search words are given
+then only notes containing all of the search words will be listed."""
+    parser = OptionParser(usage=usage,description=description)
+    parser.add_option('-e', '--editor', dest='editor', action='store',
+            default='$EDITOR', help="the text editor to use for opening note files (defaults to %default)")
+    parser.add_option('-d', '--directory', dest='notes_dir',
+            action='store', default='~/txt/', help="the notes directory to use (defaults to %default)")
+    #parser.add_argument('search_words',action='store',help="if one or more search words are given, only notes containing all of those search words will be listed",nargs='*')
+    (options, args) = parser.parse_args()
+    main(notes_dir=options.notes_dir, search_words=args, editor=options.editor)
