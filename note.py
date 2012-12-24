@@ -132,7 +132,8 @@ def main(notes_dir, search_words, editor):
         if is_exact_match or not search_words:
             print "0: %s" % os.path.relpath(paths[-1], notes_dir)
         else:
-            print "0: Create note: '%s'" % os.path.split(paths[-1])[1]
+            print "0: Create note: '{0}'".format(
+                    os.path.relpath(paths[-1], notes_dir))
 
         # Get the user's response.
         selected_number = get_number("Enter a number", 0)
