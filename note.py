@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Create and search notes"""
+"""Create and search plain text note files"""
 
 import os
 import sys
