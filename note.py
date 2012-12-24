@@ -1,18 +1,8 @@
 #!/usr/bin/env python
+"""Create and search notes"""
 import os
 import sys
 import subprocess
-"""n Store and Retrieve Notes.
-
-See the README file or `n --help` for usage.
-
-TODO
-----
-*   Print out an error msg if notes dir is empty and no search words are given.
-*   Handle case-insensitive filesystems.
-*   Ask for the user's permission before creating the notes directory.
-
-"""
 def get_all_notes(notes_dir):
     """Return a list of all the note files in notes_dir.
 
