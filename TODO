@@ -1,2 +1,3 @@
 Handle case-insensitive file systems
 Offer to create notes dir if it doesn't exist
+Handle binary files in notes dir
