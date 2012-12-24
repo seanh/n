@@ -92,7 +92,7 @@ def main(notes_dir, search_words, editor):
     # Offer to creates notes_dir if it doesn't exist.
     if not os.path.isdir(notes_dir):
         if get_boolean("Create directory {0} (y/n)?".format(notes_dir), 'y'):
-            os.mkdir(notes_dir)
+            os.makedirs(notes_dir)
             print "Created {0}".format(notes_dir)
             if not search_words:
                 sys.exit()
