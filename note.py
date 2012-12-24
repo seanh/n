@@ -142,6 +142,11 @@ def main(notes_dir, search_words, editor):
         except IndexError:
             sys.exit("That number was out of range.")
 
+    # Create subdirs if they don't already exist.
+    subdir = os.path.split(selected_path)[0]
+    if not os.path.isdir(subdir):
+        os.makedirs(subdir)
+
     # Call the editor.
     sys.exit(system('{0} "{1}"'.format(editor, selected_path)))
 
