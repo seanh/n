@@ -6,8 +6,8 @@ import sys
 import subprocess
 
 
-def get_all_notes(notes_dir):
-    """Return a list of all the note files in notes_dir.
+def get_matching_notes(notes_dir, search_words):
+    """Return all note files in notes_dir that match search_words.
 
     Searches the given notes_dir recursively and returns a list of absolute
     paths to the note files inside.
@@ -19,33 +19,25 @@ def get_all_notes(notes_dir):
             if filename.startswith('.') or filename.endswith('~'):
                 # Ignore hidden and backup files.
                 continue
-            paths.append(os.path.join(root, filename))
+            abs_path = os.path.join(root, filename)
+            rel_path = os.path.relpath(abs_path, notes_dir)
+            contents = open(abs_path, 'r').read()
+            discard = False
+            for search_word in search_words:
+                if search_word.islower():
+                    # Search for word case-insensitively.
+                    in_path = search_word in rel_path.lower()
+                    in_contents = search_word in contents.lower()
+                else:
+                    # Search for word case-sensitively.
+                    in_path = search_word in rel_path
+                    in_contents = search_word in contents
+                if (not in_path) and (not in_contents):
+                    discard = True
+                    break
+            if not discard:
+                paths.append(abs_path)
     return paths
-
-
-def get_matching_notes(notes, search_words):
-    """Return those notes from `notes` that match `search_words`."""
-
-    matching_notes = []
-    for note in notes:
-        path, filename = os.path.split(note)
-        contents = open(note, 'r').read()
-        discard = False
-        for search_word in search_words:
-            if search_word.islower():
-                # Search for word case-insensitively.
-                in_filename = search_word in filename.lower()
-                in_contents = search_word in contents.lower()
-            else:
-                # Search for word case-sensitively.
-                in_filename = search_word in filename
-                in_contents = search_word in contents
-            if (not in_filename) and (not in_contents):
-                discard = True
-                break
-        if not discard:
-            matching_notes.append(note)
-    return matching_notes
 
 
 def get_number(prompt, default):
@@ -108,10 +100,9 @@ def main(notes_dir, search_words, editor):
             sys.exit("Okay ... fine then :(")
 
     # Get the paths of all the note files that match the search words.
-    paths = get_all_notes(notes_dir)
+    paths = get_matching_notes(notes_dir, search_words)
     if paths == [] and search_words == []:
-        sys.exit("You don't have any notes yet.")
-    paths = get_matching_notes(paths, search_words)
+        sys.exit("You don't have any notes yet")
 
     # Sort the paths by modification time.
     paths.sort(key=lambda path: os.path.getmtime(path))
@@ -139,7 +130,7 @@ def main(notes_dir, search_words, editor):
             print str(
                 len(paths) - 1 - i) + ': ' + os.path.relpath(path, notes_dir)
         if is_exact_match or not search_words:
-            print "0: %s" % os.path.split(paths[-1])[1]
+            print "0: %s" % os.path.relpath(paths[-1], notes_dir)
         else:
             print "0: Create note: '%s'" % os.path.split(paths[-1])[1]
 
