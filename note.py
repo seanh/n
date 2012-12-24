@@ -111,7 +111,7 @@ def main(notes_dir, search_words, editor):
     paths = get_all_notes(notes_dir)
     if paths == [] and search_words == []:
         sys.exit("You don't have any notes yet.")
-    paths = get_matching_notes(get_all_notes(notes_dir), search_words)
+    paths = get_matching_notes(paths, search_words)
 
     # Sort the paths by modification time.
     paths.sort(key=lambda path: os.path.getmtime(path))
