@@ -166,7 +166,7 @@ To list all notes and choose one to open run `%prog`.
             default='$EDITOR',
             help="the text editor to use (default: %default)")
     parser.add_option('-d', '--directory', dest='notes_dir', action='store',
-            default='~/txt/',
+            default='~/Notes',
             help="the notes directory to use (default: %default)")
     options, args = parser.parse_args()
     main(notes_dir=options.notes_dir, search_words=args,
