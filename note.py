@@ -78,7 +78,7 @@ def system(cmd):
     return os.waitpid(p.pid, 0)[1]
 
 
-def main(notes_dir, search_words, editor):
+def main(notes_dir, search_words, editor, extension):
     """The interactive notes command.
 
     Search `notes_dir` for note files containing `search_words`, print a list
@@ -86,6 +86,9 @@ def main(notes_dir, search_words, editor):
     selected file with `editor`.
 
     """
+    if not extension.startswith('.'):
+        extension = '.' + extension
+
     # Convert notes_dir to an absolute path.
     notes_dir = os.path.abspath(os.path.expanduser(notes_dir))
 
@@ -114,7 +117,7 @@ def main(notes_dir, search_words, editor):
     is_exact_match = False
     if search_words:
         exact_match = os.path.join(notes_dir,
-                " ".join(search_words) + ".txt")
+                " ".join(search_words) + extension)
         if exact_match in paths:
             is_exact_match = True
             paths.remove(exact_match)
@@ -168,6 +171,9 @@ To list all notes and choose one to open run `%prog`.
     parser.add_option('-d', '--directory', dest='notes_dir', action='store',
             default='~/Notes',
             help="the notes directory to use (default: %default)")
+    parser.add_option('-x', '--extension', dest='extension', action='store',
+            default='txt',
+            help="the filename extension for new notes (default: %default)")
     options, args = parser.parse_args()
     main(notes_dir=options.notes_dir, search_words=args,
-            editor=options.editor)
+         editor=options.editor, extension=options.extension)
