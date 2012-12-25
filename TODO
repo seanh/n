@@ -1,3 +1,5 @@
 Handle case-insensitive file systems
-Offer to create notes dir if it doesn't exist
 Handle binary files in notes dir
+Add pre and post scripts support
+Add git pre and post scripts
+Make it pip-installable
