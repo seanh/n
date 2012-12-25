@@ -1,84 +1,81 @@
-`n`: Store and Retrieve Notes
------------------------------
+`note.py` is a _very_ simple command that tries to make it as quick and easy as
+possible to make new notes or to find and open existing notes:
 
-`n` is a simple command to help you manage a flat directory of plain text
-notes. You keep all of your notes as plain text files in a directory and use
-the simple command `n [search words]` to list your notes in order of
-modification, search your notes, view, edit and create notes.
-
-### Listing All of Your Notes
-
-The `n` command with no arguments prints an enumerated list of the filenames of
-all files in `~/txt/`, most-recently-modified last:
-
-    $ n
-    5: todo
-    4: Grocery list
-    3: Recipe for miso soup
-    2: How to read your email with mutt
-    1: How to create HTML with markdown
-    Enter a number: [1] _
-
-The most-recently-modified files are printed last so that if you have a lot of
-files it'll be the older ones that scroll off the top of your terminal.
-
-Enter the number of a file at the prompt to open that file in your $EDITOR.
-The default option (if you enter nothing at the prompt and just press return)
-will be to open the most-recently-modified (and last printed) file.  Press
-ctrl-c at the prompt if you don't want to open anything.
-
-### Searching and Creating Notes
-
-The `n` command with some arguments prints an enumerated list of the filenames
-of those files from `~/txt/` that match all of the given search words:
-
-    $ n how to
-    2: How to read your email with mutt
-    1: How to create HTML with markdown
-    0: Create note: 'how to'
+    $ note recipe
+    5: Coconut Vegetable Curry Recipe.txt
+    4: Spinach Bhaji Recipe.txt
+    3: Scrambled Tofu Recipe.txt
+    2: Banana Pancakes Recipe.txt
+    1: Shepherd's Pie Recipe.txt
+    0: Create note: 'recipe.txt'
     Enter a number: [0] _
 
-Again, enter the number of a file at the prompt to open it in your $EDITOR.
+To open a new or existing note run `note.py [arguments]`. It searches your notes
+directory and prints a list of notes that match the words in your argument, and
+asks you whether you want to open one of the notes or create a new note with a
+filename based on your argument and open that. Type the number of the file you
+want to open and hit `<Enter>`, the file will be opened in your `$EDITOR`.
 
-In this example the default option is to create a new note from the search
-term. `n` doesn't actually create the note file, it just opens it in your
-$EDITOR, to create the file you have to write it from your $EDITOR.
+The notes are kept as plain text files in a `~/Notes` directory. (You can use
+a command-line option or config file to specify a different notes directory
+location).
 
-If an existing note's filename matches the search term exactly then the default
-option will be to open that note instead.
+To list _all_ your notes and open one of them, just run `note.py` without an
+argument. In this case the default choice will be to open the most recently
+modified note, rather than to create a new note, so this is a quick way to
+re-open your last modified note.
+
+To see the command-line options and config file format, run `note.py -h`.
 
 
-**The same command is used to search and to create notes**. In the process of
-entering the title for a new note with a command like `n My New Tofu Recipe`,
-related notes are printed out for you and you're given the chance to view
-and/or edit one of those notes instead. Likewise, if your search finds no
-matching notes you just have to press return to create a new note using the
-search term as the title. This helps you to keep your notes organised, and is
-most effective if you make lots of small notes in different files, instead of a
-few big notes in a few files.
-<small>(This idea comes straight from <a href="http://notational.net/">Notational Velocity</a>.)</small>
+Install
+-------
 
-#### Details
+Requires [Python 2](http://www.python.org/). If using Python 2.6 or older, you
+also need to install argparse:
 
-Only top-level files in `~/txt` are searched, subdirectories are ignored.
+    $ pip install argparse
 
-Both the file names and the file contents are searched.
+Then just checkout or download `note.py` from GitHub and run it. It can be
+convenient to add an alias in your shell config file (e.g. `~/.bashrc` or
+`~/.zshrc`):
 
-The search is fuzzy. A file will match a search term if it contains all of the
-search words anywhere in its file name or contents, the words do not have to
-appear consecutively or in the same order as they are given in the search term.
+    alias note="/path/to/note.py"
 
-The search is smart case. For each search word, if the word is all lower-case
-then it will be matched case-insensitively. If the word contains any upper-case
-letters then it will be matched case-sensitively.
 
-#### Options
+Details
+-------
 
-`-e`, `--editor`  
-the text editor to use for opening note files (defaults to $EDITOR), e.g. `n --editor="gvim --remote-silent"`
+-  Notes are printed most recently modified last, so if you have a lot of notes
+   it's the older ones that scroll off the top of your terminal.
 
-`-d`, `--notes-dir`  
-the notes directory to use (defaults to ~/txt/), e.g. `n --notes-dir="~/Dropbox/Notes"`
+-  If your argument contains spaces you don't have to wrap it in quotes (but
+   you can if you want to).
 
-`-h`, `--help`  
-show a help message and exit
+-  You don't have to include the filename extension in your note title, it will
+   be appended for you.
+
+-  The search is fuzzy. A note will match a search term if it contains all of
+   the given search words anywhere in its filename (including filename
+   extension, and subdir names) or file contents, the words don't have to
+   appear consecutively or in the same order.
+
+-  The search is smart-case. For each search word, if the word is all
+   lower-case then it will be matched case-insensitively. If the word contains
+   any upper-case letters then it will be matched case-sensitively.
+
+-  Subdirectories in your notes directory are searched recursively. To create a
+   new note in a subdirectory, just give the relative path in the argument to
+   the `note.py` command:
+
+        $ note.py 'programming/python/How to use decorators in Python'
+
+-  You can have note files with different filename extensions. All the files in
+   your notes directory are searched, regardless of filename extension. To
+   create a note with a different filename extension use the `--extension`
+   option.
+
+-  The `note.py` command doesn't support renaming or moving notes, but you can
+   move note files (and edit their contents) using other tools, this will not
+   interfere with the `note.py` command as long as you don't do it while
+   `note.py` is running.
