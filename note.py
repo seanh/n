@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 """Create and search plain text note files"""
 
 import os
@@ -155,25 +155,55 @@ def main(notes_dir, search_words, editor, extension):
 
 
 if __name__ == '__main__':
+    import argparse
+    import ConfigParser
 
-    # Parse the command-line options and arguments and call main().
-    from optparse import OptionParser
-    usage = "%prog [options] [filename|search words]"
-    description = """To create a new note run `%prog My New Note`.
-To find notes about tofu recipes and choose one to open run
-`%prog tofu recipe`.
-To list all notes and choose one to open run `%prog`.
-"""
-    parser = OptionParser(usage=usage, description=description)
-    parser.add_option('-e', '--editor', dest='editor', action='store',
-            default='$EDITOR',
-            help="the text editor to use (default: %default)")
-    parser.add_option('-d', '--directory', dest='notes_dir', action='store',
-            default='~/Notes',
-            help="the notes directory to use (default: %default)")
-    parser.add_option('-x', '--extension', dest='extension', action='store',
-            default='txt',
-            help="the filename extension for new notes (default: %default)")
-    options, args = parser.parse_args()
-    main(notes_dir=options.notes_dir, search_words=args,
-         editor=options.editor, extension=options.extension)
+    # Parse the command-line option for the config file.
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("-c", "--config", dest="config", action="store",
+            default="~/.noterc",
+            help="the config file to use (default: %(default)s)")
+    args, remaining_argv = parser.parse_known_args()
+
+    # Parse the config file.
+    config_file = os.path.abspath(os.path.expanduser(args.config))
+    config = ConfigParser.SafeConfigParser()
+    config.read(config_file)
+    defaults = dict(config.items('DEFAULT'))
+
+    # Parse the rest of the command-line options.
+    description = """
+create a new note and open it:               %(prog)s My New Note
+find matching notes and choose one to open:  %(prog)s tofu recipe
+list _all_ notes and choose one to open:     %(prog)s"""
+    epilog = """
+the config file can be used to override the defaults for the optional
+arguments, example config file contents:
+
+  [DEFAULT]
+  editor = vim
+  extension = txt
+  notes_dir = ~/Notes
+
+if there is no config file (or an argument is missing from the config file)
+the default default will be used"""
+    parser = argparse.ArgumentParser(description=description, epilog=epilog,
+            parents=[parser],
+            formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("-e", "--editor", dest="editor", action="store",
+        default=defaults.get("editor", "$EDITOR"),
+        help="the text editor to use (default: %(default)s)")
+    parser.add_argument("-d", "--directory", dest="notes_dir", action="store",
+        default=defaults.get("notes_dir", "~/Notes"),
+        help="the notes directory to use (default: %(default)s)")
+    parser.add_argument("-x", "--extension", dest="extension", action="store",
+        default=defaults.get("extension", "txt"),
+        help="the filename extension for new notes (default: %(default)s)")
+    parser.add_argument("search_words", action="store", nargs="*",
+        help="the list of words to search for in your notes, "
+          "also used as the filename if you choose to create a new note "
+          "(optional, if no search words are given all notes will be listed)")
+    args = parser.parse_args()
+
+    main(notes_dir=args.notes_dir, search_words=args.search_words,
+         editor=args.editor, extension=args.extension)
